@@ -53,4 +53,44 @@ It trades using two moving averages and showcases how to use the libraries toget
 If you find any bugs or issues, I’d really appreciate the feedback! 🌹
 
 
+#### Structure
+
+```
+.
+├── libs
+│   ├── array
+│   │   ├── array-tools.mqh
+│   │   ├── array-tools.test.ex4
+│   │   └── array-tools.test.mq4
+│   ├── order
+│   │   ├── lot-calculator.test.ex4
+│   │   ├── MarketOrderManager.mqh
+│   │   ├── OrderManagerConstants.mqh
+│   │   ├── OrderManager.mqh
+│   │   ├── PendingOrderManager.mqh
+│   │   ├── TradeUtils.mqh
+│   │   ├── TradeUtils.test.ex4
+│   │   ├── TradeUtils.test.mq4
+│   │   └── TradingSystem.mqh
+│   ├── strategy
+│   │   ├── strategy1.mqh
+│   │   └── strategy-abstract.mqh
+│   ├── tools
+│   │   ├── comment-info.mqh
+│   │   ├── defines.mqh
+│   │   ├── logger.mqh
+│   │   ├── logger.test.ex4
+│   │   ├── logger.test.mq4
+│   │   ├── time-handler.mqh
+│   │   ├── time-handler.test.ex4
+│   │   └── time-handler.test.mq4
+│   └── trade
+│       ├── trade-history.mqh
+│       ├── trade-history.test.ex4
+│       ├── trade-history.test.mq4
+│       └── trade-manager.mqh
+├── ma-bot.ex4
+└── ma-bot.mq4
+
+```
 
