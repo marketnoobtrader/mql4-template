@@ -25,11 +25,6 @@ public:
    bool IsNewCandle()
    {
       datetime currentCandleTime = iTime(Symbol(), m_timeframe, 0);
-      if (m_lastCandleTime == 0)
-      {
-         m_lastCandleTime = currentCandleTime;
-         return false;
-      }
       if (currentCandleTime != m_lastCandleTime)
       {
          m_lastCandleTime = currentCandleTime;
