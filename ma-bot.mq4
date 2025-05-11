@@ -46,8 +46,8 @@ input ENUM_LogLevel logLevel = LOG_DEBUG;
 //+-------------------------------+
 CLogger *logger;
 CTradingSystem *g_tradingSystem = new CTradingSystem(LotSize, Slippage, StopLoss, TakeProfit);
-MaCrossoverStrategy strategy(g_tradingSystem);
-BotController bot(&strategy);
+MaCrossoverStrategy* strategy = new MaCrossoverStrategy(g_tradingSystem);
+BotController bot(strategy);
 NewCandleObserver g_currentCandle(PERIOD_CURRENT);
 EnhancedTimeHandler *g_timeHandler = NULL;
 
@@ -86,13 +86,12 @@ void OnDeinit(const int reason)
         delete g_timeHandler;
         g_timeHandler = NULL;
        }
-    if(logger != NULL)
-       {
-        delete logger;
-        logger = NULL;
-       }
+    delete logger;
+    logger = NULL;
     delete g_tradingSystem;
     g_tradingSystem = NULL;
+    delete strategy;
+    strategy = NULL;
     const int errorCode = GetLastError();
     if(errorCode != ERR_NO_ERROR)
        {
