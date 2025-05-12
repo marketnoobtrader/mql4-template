@@ -1,15 +1,14 @@
 //+------------------------------------------------------------------+
-//|                                                 array-tools.mqh |
-//|                                       Copyright 2025, Your Name |
-//|                                             https://example.com |
+//|                                                      ProjectName |
+//|                                      Copyright 2018, CompanyName |
+//|                                       http://www.companyname.net |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2025, Your Name"
-#property link "https://example.com"
-#property version "1.00"
-#property strict
+
+#ifndef __ARRAY_TOOLS_MQH__
+#define __ARRAY_TOOLS_MQH__
 
 //+------------------------------------------------------------------+
-//| ArrayTools class - OOP approach to array manipulation            |
+//|                                                                  |
 //+------------------------------------------------------------------+
 class ArrayTools
    {
@@ -98,4 +97,6 @@ public:
        }
    };
 
+
+#endif
 //+------------------------------------------------------------------+
