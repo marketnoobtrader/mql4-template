@@ -56,32 +56,34 @@ void OnTick()
 //+------------------------------------------------------------------+
 void AnalyzeSpecificOrder(int index)
    {
-    HistoryOrderInfo histInfo;
-// Get details of the specific order
+    SPositionInfo histInfo;
+    string orderType = (histInfo.type == OP_BUY) ? "BUY" : (histInfo.type == OP_SELL) ? "SELL"
+                       : IntegerToString(histInfo.type);
     if(history.GetOrderInfo(index, histInfo))
        {
-        // Do something with the order information
-        string orderType = (histInfo.type == OP_BUY) ? "BUY" : (histInfo.type == OP_SELL) ? "SELL"
-                           : IntegerToString(histInfo.type);
-        Print("Analyzing order #", index);
-        Print("Type: ", orderType);
+        Print("======== Order Info (Index #", index, ") ========");
         Print("Ticket: ", histInfo.ticket);
-        Print("Open Time: ", TimeToString(histInfo.openTime));
-        Print("Close Time: ", TimeToString(histInfo.closeTime));
+        Print("Type: ", orderType);
         Print("Symbol: ", histInfo.symbol);
+        Print("Lot Size: ", DoubleToString(histInfo.lot, 2));
         Print("Open Price: ", DoubleToString(histInfo.openPrice, Digits));
         Print("Close Price: ", DoubleToString(histInfo.closePrice, Digits));
+        Print("Stop Loss (points): ", DoubleToString(histInfo.stoplossPoint, 1));
+        Print("Take Profit (points): ", DoubleToString(histInfo.takeProfitPoint, 1));
+        Print("Stop Loss Price: ", DoubleToString(histInfo.stoplossPrice, Digits));
+        Print("Take Profit Price: ", DoubleToString(histInfo.takeProfitPrice, Digits));
+        Print("Open Time: ", TimeToString(histInfo.openTime, TIME_DATE | TIME_MINUTES));
+        Print("Close Time: ", TimeToString(histInfo.closeTime, TIME_DATE | TIME_MINUTES));
+        Print("Last Modified: ", TimeToString(histInfo.lastModify, TIME_DATE | TIME_MINUTES));
         Print("Profit: ", DoubleToString(histInfo.profit, 2));
-        // Example: Calculate trade duration
         int durationSeconds = (int)(histInfo.closeTime - histInfo.openTime);
-        Print("Trade duration: ", durationSeconds, " seconds (", durationSeconds / 60, " minutes)");
+        Print("Trade Duration: ", durationSeconds, " seconds (", durationSeconds / 60, " minutes)");
        }
     else
        {
         Print("Failed to get order information for index ", index);
        }
    }
-
 
 //+------------------------------------------------------------------+
 //| Custom function that can be called after a trade is executed     |
@@ -92,7 +94,6 @@ void OnTradeExecuted()
        {
         Print("Trade history updated after new trade");
         history.PrintLastOrders();
-        Print("=========================");
         AnalyzeSpecificOrder(0);
        }
    }
