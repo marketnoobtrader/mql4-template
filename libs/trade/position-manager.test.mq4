@@ -6,17 +6,20 @@
 #include "types.trade.mqh"
 #include "position-manager.mqh" // Assuming your class is saved here
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+input double InpBreakEvenProfit = 1; // Profit points for break-even (0 = disabled)
+input double InpBreakEvenOffset = 0;  // Break-even offset in points (0 = exact entry)
+input bool InpPrintPositions = true;   // Print position details on each tick
+
 CPositionManager positionManager;
 
 //+------------------------------------------------------------------+
-//| Expert initialization function                                   |
+//|                                                                  |
 //+------------------------------------------------------------------+
-int OnInit()
+void PrintAllPositions(int total)
    {
-    Print("Initializing Position Manager...");
-    positionManager.UpdateFromMarket();
-    int total = positionManager.Total();
-    Print("Total positions tracked: ", total);
     SPositionInfo pos;
     for(int i = 0; i < total; i++)
        {
@@ -39,6 +42,25 @@ int OnInit()
                         TimeToString(pos.closeTime, TIME_DATE | TIME_SECONDS),
                         TimeToString(pos.lastModify, TIME_DATE | TIME_SECONDS));
            }
+       }
+   }
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+   {
+    Print("Initializing Position Manager...");
+    positionManager.UpdateFromMarket();
+    int total = positionManager.Total();
+    if(InpBreakEvenProfit > 0)
+       {
+        positionManager.SetBreakEvenAll(InpBreakEvenProfit, InpBreakEvenOffset);
+       }
+    if(InpPrintPositions)
+       {
+        Print("Total positions tracked: ", total);
+        PrintAllPositions(total);
        }
     return INIT_SUCCEEDED;
    }
