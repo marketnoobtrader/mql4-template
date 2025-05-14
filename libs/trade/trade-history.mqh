@@ -6,23 +6,8 @@
 #ifndef __TRADE_HISTORY_MQH__
 #define __TRADE_HISTORY_MQH__
 
-struct SPositionInfo
-   {
-    int              ticket;
-    double           lot;
-    int              type;
-    string           symbol;
-    double           openPrice;
-    double           closePrice;
-    double           profit;
-    double           stoplossPoint;
-    double           takeProfitPoint;
-    double           stoplossPrice;
-    double           takeProfitPrice;
-    datetime         openTime;
-    datetime         closeTime;
-    datetime         lastModify;
-   };
+#include "types.trade.mqh"
+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -64,14 +49,14 @@ public:
         if(totalOrders == 0)
             return true; // No history - nothing to do
         int ordersFound = 0;
+        double slPoint;
+        double tpPoint;
         for(int i = totalOrders - 1; i >= 0 && ordersFound < m_historyCount; i--)
            {
             if(!OrderSelect(i, SELECT_BY_POS, MODE_HISTORY))
                 continue;
             if(OrderSymbol() != Symbol())
                 continue;
-            double slPoint;
-            double tpPoint;
             ProcessOrder();
             m_orders[ordersFound].ticket = OrderTicket();
             m_orders[ordersFound].lot = OrderLots();
@@ -84,7 +69,7 @@ public:
             m_orders[ordersFound].takeProfitPrice = OrderTakeProfit();
             m_orders[ordersFound].openTime = OrderOpenTime();
             m_orders[ordersFound].closeTime = OrderCloseTime();
-            if(OrderType() == OP_BUY)
+            if(m_orders[ordersFound].type == OP_BUY || m_orders[ordersFound].type == OP_BUYLIMIT || m_orders[ordersFound].type == OP_BUYSTOP)
                {
                 slPoint = m_orders[ordersFound].openPrice - m_orders[ordersFound].stoplossPrice;
                }
