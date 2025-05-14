@@ -9,7 +9,7 @@
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-input double InpBreakEvenProfit = 1; // Profit points for break-even (0 = disabled)
+input double InpBreakEvenProfit = 0; // Profit points for break-even (0 = disabled)
 input double InpBreakEvenOffset = 0;  // Break-even offset in points (0 = exact entry)
 input bool InpPrintPositions = true;   // Print position details on each tick
 
@@ -25,7 +25,7 @@ void PrintAllPositions(int total)
        {
         if(positionManager.GetPositionByIndex(i, pos))
            {
-            PrintFormat("#[%d] Ticket=%d| Symbol=%s| Type=%s| Lot=%.2f| OpenPrice=%.5f| ClosePrice=%.5f| Profit=%.2f| SL Points=%.2f| TP Points=%.2f| SL Price=%.5f| TP Price=%.5f| OpenTime=%s| CloseTime=%s| LastModify=%s",
+            PrintFormat("#[%d] Ticket=%d| Symbol=%s| Type=%s| Lot=%.2f| OpenPrice=%.5f| ClosePrice=%.5f| PriceDistance=%.5f| Profit=%.2f| SL Points=%.2f| TP Points=%.2f| SL Price=%.5f| TP Price=%.5f| OpenTime=%s| CloseTime=%s| LastModify=%s",
                         i,
                         pos.ticket,
                         pos.symbol,
@@ -33,6 +33,7 @@ void PrintAllPositions(int total)
                         pos.lot,
                         pos.openPrice,
                         pos.closePrice,
+                        pos.priceDistance,
                         pos.profit,
                         pos.stoplossPoint,
                         pos.takeProfitPoint,
@@ -53,10 +54,7 @@ int OnInit()
     Print("Initializing Position Manager...");
     positionManager.UpdateFromMarket();
     int total = positionManager.Total();
-    if(InpBreakEvenProfit > 0)
-       {
-        positionManager.SetBreakEvenAll(InpBreakEvenProfit, InpBreakEvenOffset);
-       }
+    positionManager.SetBreakEvenAll(InpBreakEvenProfit, InpBreakEvenOffset);
     if(InpPrintPositions)
        {
         Print("Total positions tracked: ", total);

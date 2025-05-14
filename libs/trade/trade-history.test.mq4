@@ -14,6 +14,30 @@
 TradeHistory history(10); // Track last 10 orders
 
 //+------------------------------------------------------------------+
+//| Helper function to convert order type to string                  |
+//+------------------------------------------------------------------+
+string OrderTypeToString(int type)
+   {
+    switch(type)
+       {
+        case OP_BUY:
+            return "Buy";
+        case OP_SELL:
+            return "Sell";
+        case OP_BUYLIMIT:
+            return "Buy Limit";
+        case OP_SELLLIMIT:
+            return "Sell Limit";
+        case OP_BUYSTOP:
+            return "Buy Stop";
+        case OP_SELLSTOP:
+            return "Sell Stop";
+        default:
+            return "Unknown";
+       }
+   }
+
+//+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit()
@@ -57,17 +81,16 @@ void OnTick()
 void AnalyzeSpecificOrder(int index)
    {
     SPositionInfo histInfo;
-    string orderType = (histInfo.type == OP_BUY) ? "BUY" : (histInfo.type == OP_SELL) ? "SELL"
-                       : IntegerToString(histInfo.type);
     if(history.GetOrderInfo(index, histInfo))
        {
         Print("======== Order Info (Index #", index, ") ========");
         Print("Ticket: ", histInfo.ticket);
-        Print("Type: ", orderType);
+        Print("Type: ", OrderTypeToString(histInfo.type));
         Print("Symbol: ", histInfo.symbol);
         Print("Lot Size: ", DoubleToString(histInfo.lot, 2));
         Print("Open Price: ", DoubleToString(histInfo.openPrice, Digits));
         Print("Close Price: ", DoubleToString(histInfo.closePrice, Digits));
+        Print("Price Distance: ", DoubleToString(histInfo.priceDistance, Digits));
         Print("Stop Loss (points): ", DoubleToString(histInfo.stoplossPoint, 1));
         Print("Take Profit (points): ", DoubleToString(histInfo.takeProfitPoint, 1));
         Print("Stop Loss Price: ", DoubleToString(histInfo.stoplossPrice, Digits));

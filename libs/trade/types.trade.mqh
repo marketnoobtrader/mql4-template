@@ -14,6 +14,7 @@ struct SPositionInfo
     string           symbol;
     double           openPrice;
     double           closePrice;
+    double           priceDistance; // close - open
     double           profit;
     double           stoplossPoint;
     double           takeProfitPoint;

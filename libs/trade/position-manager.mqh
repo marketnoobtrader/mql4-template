@@ -39,6 +39,7 @@ public:
     // Utility methods
     void             UpdateFromMarket();
     double           GetTotalProfit() const;
+    bool             CPositionManager::isBuyTypeOrder(SPositionInfo &target) const;
 
     // Risk Management
     static bool      CPositionManager::SetBreakEven(SPositionInfo &position, double minProfitPoints, double offsetPoints);
@@ -191,14 +192,29 @@ void CPositionManager::UpdateFromMarket()
             pos.openTime = OrderOpenTime();
             pos.closeTime = OrderCloseTime();
             pos.lastModify = Time[0];
-            pos.takeProfitPoint = MathAbs(pos.openPrice - pos.takeProfitPrice);
-            if(pos.type == OP_BUY || pos.type == OP_BUYLIMIT || pos.type == OP_BUYSTOP)
+            if(isBuyTypeOrder(pos))
                {
-                pos.stoplossPoint = pos.openPrice - pos.stoplossPrice;
+                pos.priceDistance = Bid - pos.openPrice;
                }
             else
                {
-                pos.stoplossPoint = pos.stoplossPrice - pos.openPrice;
+                pos.priceDistance = pos.openPrice - Ask;
+               }
+            pos.takeProfitPoint = pos.takeProfitPrice == 0 ? 0 : MathAbs(pos.openPrice - pos.takeProfitPrice);
+            if(pos.stoplossPrice == 0)
+               {
+                pos.stoplossPoint = 0;
+               }
+            else
+               {
+                if(isBuyTypeOrder(pos))
+                   {
+                    pos.stoplossPoint = pos.openPrice - pos.stoplossPrice;
+                   }
+                else
+                   {
+                    pos.stoplossPoint = pos.stoplossPrice - pos.openPrice;
+                   }
                }
             AddPosition(pos);
            }
@@ -219,36 +235,59 @@ double CPositionManager::GetTotalProfit() const
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-static bool CPositionManager::SetBreakEven(SPositionInfo &position, double minProfitPoints = 1, double offsetPoints = 0)
+bool CPositionManager::isBuyTypeOrder(SPositionInfo &target) const
+   {
+    return target.type == OP_BUY || target.type == OP_BUYLIMIT || target.type == OP_BUYSTOP;
+   }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+static bool CPositionManager::SetBreakEven(SPositionInfo &position, double minProfitPoints = 0, double offsetPoints = 0)
    {
 // Get market data
 // double point = MarketInfo(position.symbol, MODE_POINT);
 // int digits = (int)MarketInfo(position.symbol, MODE_DIGITS);
 // double bid = MarketInfo(position.symbol, MODE_BID);
 // double ask = MarketInfo(position.symbol, MODE_ASK);
+    minProfitPoints *= _Point;
+    offsetPoints *= _Point;
     if(
-        position.closeTime > 0 ||
-        !(position.type == OP_BUY || position.type == OP_SELL) ||
-        position.takeProfitPoint < minProfitPoints * _Point)
+        position.type != OP_BUY &&
+        position.type != OP_SELL)
         return false;
+    if(position.closeTime != 0)
+        return false;
+    if(position.priceDistance < minProfitPoints)
+        return false;
+    int errorCode;
     double newStopLoss;
     const int ticket = position.ticket;
     if(position.type == OP_BUY)
-        newStopLoss = position.openPrice + (offsetPoints * _Point);
+        newStopLoss = position.openPrice + offsetPoints;
     else
         if(position.type == OP_SELL)
-            newStopLoss = position.openPrice - (offsetPoints * _Point);
+            newStopLoss = position.openPrice - offsetPoints;
 // Update the stop loss in the market
     const bool isOrderSelected = OrderSelect(ticket, SELECT_BY_TICKET);
     if(!isOrderSelected)
+       {
+        errorCode = GetLastError();
+        Print("Ticket: ", ticket, "| Can't select the order! Error code: ", errorCode);
         return false;
+       }
     const bool isOrderModified = OrderModify(ticket, position.openPrice,
                                  NormalizeDouble(newStopLoss, Digits),
                                  position.takeProfitPrice,
                                  0,
                                  clrBlue);
     if(!isOrderModified)
+       {
+        errorCode = GetLastError();
+        Print("Ticket: ", ticket, "| Can't modify the order! Error code: ", errorCode);
+        Print("Ticket: ", ticket, "| newStopLoss: ", newStopLoss);
         return false;
+       }
 // Update our position record
     position.stoplossPrice = newStopLoss;
     if(position.type == OP_BUY)
@@ -262,7 +301,7 @@ static bool CPositionManager::SetBreakEven(SPositionInfo &position, double minPr
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void CPositionManager::SetBreakEvenAll(double minProfitPoints = 1, double offsetPoints = 0)
+void CPositionManager::SetBreakEvenAll(double minProfitPoints = 0, double offsetPoints = 0)
    {
     for(int i = 0; i < m_total; i++)
        {

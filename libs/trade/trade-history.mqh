@@ -8,7 +8,6 @@
 
 #include "types.trade.mqh"
 
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -36,6 +35,11 @@ public:
             count = 5; // Default to 5 if invalid number provided
         m_historyCount = count;
         ArrayResize(m_orders, m_historyCount);
+       }
+
+    bool             isBuyTypeOrder(SPositionInfo &target) const
+       {
+        return target.type == OP_BUY || target.type == OP_BUYLIMIT || target.type == OP_BUYSTOP;
        }
 
     bool             Update()
@@ -69,15 +73,23 @@ public:
             m_orders[ordersFound].takeProfitPrice = OrderTakeProfit();
             m_orders[ordersFound].openTime = OrderOpenTime();
             m_orders[ordersFound].closeTime = OrderCloseTime();
-            if(m_orders[ordersFound].type == OP_BUY || m_orders[ordersFound].type == OP_BUYLIMIT || m_orders[ordersFound].type == OP_BUYSTOP)
+            m_orders[ordersFound].priceDistance = m_orders[ordersFound].closePrice - m_orders[ordersFound].openPrice;
+            if(m_orders[ordersFound].stoplossPrice == 0)
                {
-                slPoint = m_orders[ordersFound].openPrice - m_orders[ordersFound].stoplossPrice;
+                slPoint = 0;
                }
             else
                {
-                slPoint = m_orders[ordersFound].stoplossPrice - m_orders[ordersFound].openPrice;
+                if(isBuyTypeOrder(m_orders[ordersFound]))
+                   {
+                    slPoint = m_orders[ordersFound].openPrice - m_orders[ordersFound].stoplossPrice;
+                   }
+                else
+                   {
+                    slPoint = m_orders[ordersFound].stoplossPrice - m_orders[ordersFound].openPrice;
+                   }
                }
-            tpPoint = m_orders[ordersFound].openPrice - m_orders[ordersFound].takeProfitPoint;
+            tpPoint = m_orders[ordersFound].takeProfitPoint == 0 ? 0 : m_orders[ordersFound].openPrice - m_orders[ordersFound].takeProfitPoint;
             m_orders[ordersFound].takeProfitPoint = MathAbs(tpPoint);
             m_orders[ordersFound].stoplossPoint = slPoint;
             m_orders[ordersFound].lastModify = Time[0];
@@ -132,7 +144,7 @@ public:
                 continue;
             string orderType = (m_orders[i].type == OP_BUY) ? "BUY" : (m_orders[i].type == OP_SELL) ? "SELL"
                                : IntegerToString(m_orders[i].type);
-            PrintFormat("#[%d] Ticket=%d, Symbol=%s, Type=%s, Lot=%.2f, OpenPrice=%.5f, ClosePrice=%.5f, Profit=%.2f, SL Points=%.2f, TP Points=%.2f, SL Price=%.5f, TP Price=%.5f, OpenTime=%s, CloseTime=%s, LastModify=%s",
+            PrintFormat("#[%d] Ticket=%d| Symbol=%s| Type=%s| Lot=%.2f| OpenPrice=%.5f| ClosePrice=%.5f| PriceDistance=%.5f| Profit=%.2f| SL Points=%.2f| TP Points=%.2f| SL Price=%.5f| TP Price=%.5f| OpenTime=%s| CloseTime=%s| LastModify=%s",
                         i,
                         m_orders[i].ticket,
                         m_orders[i].symbol,
@@ -140,6 +152,7 @@ public:
                         m_orders[i].lot,
                         m_orders[i].openPrice,
                         m_orders[i].closePrice,
+                        m_orders[i].priceDistance,
                         m_orders[i].profit,
                         m_orders[i].stoplossPoint,
                         m_orders[i].takeProfitPoint,
