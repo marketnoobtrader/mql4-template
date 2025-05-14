@@ -32,9 +32,9 @@ So, I created a clean, structured template to solve that problem and help shift 
 This template includes components that are commonly needed in most EA projects. It follows an object-oriented programming (OOP) approach, with performance in mind. There's **no copy-pasting** involved—everything is designed around references and pointers.
 
 #### Included Libraries
-```
 
 Each section includes `.test` files (e.g., `logger.test.mq4`) to help understand how to use the corresponding libraries.
+
 
 #### Example Bot
 
