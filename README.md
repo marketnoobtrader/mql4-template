@@ -7,9 +7,6 @@
 
 یه تمیلیتی ساختم با این ویژگی هایی که تقریبا توی همه پروژه ها نیاز میشه 
 
-۵تا کتابخونه داریم:
-trade-tools-strategy-order-array
-
 که توی هر قسمت فایلهایی با پسوند .test هستش مثلا:
 logger.test.mq4
 اینارو ساختم برای تست و فهمیدن نحوه استفاده از کتابخونه 
@@ -35,11 +32,6 @@ So, I created a clean, structured template to solve that problem and help shift 
 This template includes components that are commonly needed in most EA projects. It follows an object-oriented programming (OOP) approach, with performance in mind. There's **no copy-pasting** involved—everything is designed around references and pointers.
 
 #### Included Libraries
-
-The template includes 5 libraries bundled under:
-
-```
-trade-tools-strategy-order-array
 ```
 
 Each section includes `.test` files (e.g., `logger.test.mq4`) to help understand how to use the corresponding libraries.
@@ -56,41 +48,43 @@ If you find any bugs or issues, I’d really appreciate the feedback! 🌹
 #### Structure
 
 ```
-.
-├── libs
-│   ├── array
-│   │   ├── array-tools.mqh
-│   │   ├── array-tools.test.ex4
-│   │   └── array-tools.test.mq4
-│   ├── order
-│   │   ├── lot-calculator.test.ex4
-│   │   ├── MarketOrderManager.mqh
-│   │   ├── OrderManagerConstants.mqh
-│   │   ├── OrderManager.mqh
-│   │   ├── PendingOrderManager.mqh
-│   │   ├── TradeUtils.mqh
-│   │   ├── TradeUtils.test.ex4
-│   │   ├── TradeUtils.test.mq4
-│   │   └── TradingSystem.mqh
-│   ├── strategy
-│   │   ├── strategy1.mqh
-│   │   └── strategy-abstract.mqh
-│   ├── tools
-│   │   ├── comment-info.mqh
-│   │   ├── defines.mqh
-│   │   ├── logger.mqh
-│   │   ├── logger.test.ex4
-│   │   ├── logger.test.mq4
-│   │   ├── time-handler.mqh
-│   │   ├── time-handler.test.ex4
-│   │   └── time-handler.test.mq4
-│   └── trade
-│       ├── trade-history.mqh
-│       ├── trade-history.test.ex4
-│       ├── trade-history.test.mq4
-│       └── trade-manager.mqh
-├── ma-bot.ex4
-└── ma-bot.mq4
+Directory structure:
+└── marketnoobtrader-mql4-template/
+    ├── README.md
+    ├── LICENSE
+    ├── ma-bot.mq4
+    └── libs/
+        ├── array/
+        │   ├── array-tools.mqh
+        │   └── array-tools.test.mq4
+        ├── order/
+        │   ├── MarketOrderManager.mqh
+        │   ├── OrderManager.mqh
+        │   ├── OrderManagerConstants.mqh
+        │   ├── PendingOrderManager.mqh
+        │   ├── TradeUtils.mqh
+        │   ├── TradeUtils.test.mq4
+        │   └── TradingSystem.mqh
+        ├── strategy/
+        │   ├── strategy-abstract.mqh
+        │   └── strategy1.mqh
+        ├── tools/
+        │   ├── comment-info.mqh
+        │   ├── defines.mqh
+        │   ├── fractal.mqh
+        │   ├── logger.mqh
+        │   ├── logger.test.mq4
+        │   ├── time-handler.mqh
+        │   └── time-handler.test.mq4
+        └── trade/
+            ├── position-manager.mqh
+            ├── position-manager.test.mq4
+            ├── trade-history.mqh
+            ├── trade-history.test.mq4
+            ├── trade-manager.mqh
+            ├── trail-stop.mqh
+            └── types.trade.mqh
+
 
 ```
 
