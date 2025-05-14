@@ -3,6 +3,8 @@
 //|                                      Copyright 2018, CompanyName |
 //|                                       http://www.companyname.net |
 //+------------------------------------------------------------------+
+#ifndef __POSITION_MANAGER_MQH__
+#define __POSITION_MANAGER_MQH__
 
 #include "types.trade.mqh"
 
@@ -178,6 +180,8 @@ void CPositionManager::UpdateFromMarket()
 // Load open positions
     for(int i = 0; i < OrdersTotal(); i++)
        {
+        if(OrderSymbol() != Symbol())
+            continue;
         if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
            {
             pos.ticket = OrderTicket();
@@ -191,7 +195,7 @@ void CPositionManager::UpdateFromMarket()
             pos.takeProfitPrice = OrderTakeProfit();
             pos.openTime = OrderOpenTime();
             pos.closeTime = OrderCloseTime();
-            pos.lastModify = Time[0];
+            pos.lastModify = TimeCurrent();
             if(isBuyTypeOrder(pos))
                {
                 pos.priceDistance = Bid - pos.openPrice;
@@ -216,6 +220,9 @@ void CPositionManager::UpdateFromMarket()
                     pos.stoplossPoint = pos.stoplossPrice - pos.openPrice;
                    }
                }
+            pos.stoplossPoint = NormalizeDouble(pos.stoplossPoint, Digits);
+            pos.takeProfitPoint = NormalizeDouble(pos.takeProfitPoint, Digits);
+            pos.priceDistance = NormalizeDouble(pos.priceDistance, Digits);
             AddPosition(pos);
            }
        }
@@ -294,7 +301,7 @@ static bool CPositionManager::SetBreakEven(SPositionInfo &position, double minPr
         position.stoplossPoint = position.openPrice - position.stoplossPrice;
     else
         position.stoplossPoint = position.stoplossPrice - position.openPrice;
-    position.lastModify = Time[0];
+    position.lastModify = TimeCurrent();
     return true;
    }
 
@@ -309,4 +316,7 @@ void CPositionManager::SetBreakEvenAll(double minProfitPoints = 0, double offset
        }
    }
 
+//+------------------------------------------------------------------+
+
+#endif
 //+------------------------------------------------------------------+

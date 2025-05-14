@@ -92,9 +92,12 @@ public:
             tpPoint = m_orders[ordersFound].takeProfitPoint == 0 ? 0 : m_orders[ordersFound].openPrice - m_orders[ordersFound].takeProfitPoint;
             m_orders[ordersFound].takeProfitPoint = MathAbs(tpPoint);
             m_orders[ordersFound].stoplossPoint = slPoint;
-            m_orders[ordersFound].lastModify = Time[0];
+            m_orders[ordersFound].lastModify = TimeCurrent();
             ordersFound++;
            }
+        m_orders[ordersFound].stoplossPoint = NormalizeDouble(m_orders[ordersFound].stoplossPoint, Digits);
+        m_orders[ordersFound].takeProfitPoint = NormalizeDouble(m_orders[ordersFound].takeProfitPoint, Digits);
+        m_orders[ordersFound].priceDistance = NormalizeDouble(m_orders[ordersFound].priceDistance, Digits);
         m_totalNetProfit = NormalizeDouble(m_totalNetProfit, Digits);
         m_totalBuyProfit = NormalizeDouble(m_totalBuyProfit, Digits);
         m_totalSellProfit = NormalizeDouble(m_totalSellProfit, Digits);
