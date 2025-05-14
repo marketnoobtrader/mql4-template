@@ -6,13 +6,13 @@
 #ifndef __FRACTAL_MQH__
 #define __FRACTAL_MQH__
 
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-int GetLastUpperFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 100)
+int GetUpperFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 100, int startBarIndex = 2)
    {
-    for(int i = 2; i < maxBarsToCheck; i++)  // start from 2 due to fractal delay
+    maxBarsToCheck += startBarIndex;
+    for(int i = startBarIndex; i < maxBarsToCheck; i++)
        {
         double value = iFractals(symbol, timeframe, MODE_UPPER, i);
         if(value != EMPTY_VALUE)
@@ -21,13 +21,13 @@ int GetLastUpperFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 
     return -1; // not found
    }
 
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-int GetLastLowerFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 100)
+int GetLowerFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 100, int startBarIndex = 2)
    {
-    for(int i = 2; i < maxBarsToCheck; i++)  // start from 2 due to fractal delay
+    maxBarsToCheck += startBarIndex;
+    for(int i = 2; i < maxBarsToCheck; i++)
        {
         double value = iFractals(symbol, timeframe, MODE_LOWER, i);
         if(value != EMPTY_VALUE)
@@ -35,7 +35,6 @@ int GetLastLowerFractalIndex(string symbol, int timeframe, int maxBarsToCheck = 
        }
     return -1; // not found
    }
-
 
 #endif
 
@@ -54,7 +53,5 @@ void OnTick()
 }
 
 */
-
-
 
 //+------------------------------------------------------------------+
