@@ -6,7 +6,7 @@
 
 #property copyright "Copyright 2021, MQL4club Software"
 #property link "https://t.me/pip_to_pip"
-#property version "2.0"
+#property version "6.0"
 #property strict
 
 #include <stdlib.mqh>
@@ -16,36 +16,15 @@
 #include "libs/trade/trade-manager.mqh"
 #include "libs/strategy/strategy1.mqh"
 #include "libs/order/TradingSystem.mqh"
-
-//+-------------------------------+
-//| Input Parameters              |
-//+-------------------------------+
-input string Fast_MA_Settings = "----- Fast MA Settings -----";
-input int Fast_MA_Period = 7;
-input ENUM_MA_METHOD Fast_MA_Method = MODE_SMA;
-input ENUM_APPLIED_PRICE Fast_MA_Applied = PRICE_CLOSE;
-
-input string Slow_MA_Settings = "----- Slow MA Settings -----";
-input int Slow_MA_Period = 21;
-input ENUM_MA_METHOD Slow_MA_Method = MODE_SMA;
-input ENUM_APPLIED_PRICE Slow_MA_Applied = PRICE_CLOSE;
-
-input string Trade_Settings = "----- Trade Settings -----";
-input double LotSize = 0.01;
-input int StopLoss = 200;
-input int TakeProfit = 600;
-input int Slippage = 20;
-input ENUM_TIMEFRAMES Timeframe = PERIOD_M1;
-input int MagicNumber = 1111;
-input string TradingStartTime = "01:00:00";
-input string TradingEndTime = "19:00:00";
-input ENUM_LogLevel logLevel = LOG_DEBUG;
+#include "libs/types.mqh"
+#include "libs/inputs.mqh"
+#include "libs/commons.mqh"
 
 //+-------------------------------+
 //| Global Instance               |
 //+-------------------------------+
 CLogger *logger;
-CTradingSystem *g_tradingSystem = new CTradingSystem(LotSize, Slippage, StopLoss, TakeProfit);
+CTradingSystem *g_tradingSystem = new CTradingSystem(getLotSize(), Slippage, StopLoss, TakeProfit);
 MaCrossoverStrategy* strategy = new MaCrossoverStrategy(g_tradingSystem);
 BotController bot(strategy);
 NewCandleObserver g_currentCandle(PERIOD_CURRENT);
@@ -60,7 +39,9 @@ int OnInit()
     logger = CLogger::GetInstance();
     logger.setLevel(logLevel);
     logger.log(LOG_DEBUG, "bot started!!");
+    logger.log(LOG_DEBUG, "getLotSize(): " + (string)getLotSize());
     g_timeHandler = new EnhancedTimeHandler(TradingStartTime, TradingEndTime);
+
     return INIT_SUCCEEDED;
    }
 
@@ -70,10 +51,15 @@ int OnInit()
 void OnTick()
    {
     commentInfo();
-    if(g_currentCandle.IsNewCandle() && g_timeHandler.IsWithinTradingHours())
-       {
-        bot.OnNewTick();
-       }
+
+    if(!(g_currentCandle.IsNewCandle() && g_timeHandler.IsWithinTradingHours()))
+        return;
+
+    if(LotSizeMode == LOT_BY_EQUITY)
+        g_tradingSystem.setLotSize(getLotSize());
+
+    bot.OnNewTick();
+
    }
 
 //+------------------------------------------------------------------+
