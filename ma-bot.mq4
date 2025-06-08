@@ -6,14 +6,13 @@
 
 #property copyright "Copyright 2021, MQL4club Software"
 #property link "https://t.me/pip_to_pip"
-#property version "6.0"
+#property version "6.1"
 #property strict
 
 #include <stdlib.mqh>
 #include "libs/tools/logger.mqh"
 #include "libs/tools/comment-info.mqh"
 #include "libs/tools/time-handler.mqh"
-#include "libs/trade/trade-manager.mqh"
 #include "libs/strategy/strategy1.mqh"
 #include "libs/order/TradingSystem.mqh"
 #include "libs/types.mqh"
@@ -25,8 +24,7 @@
 //+-------------------------------+
 CLogger *logger;
 CTradingSystem *g_tradingSystem = new CTradingSystem(getLotSize(), Slippage, StopLoss, TakeProfit);
-MaCrossoverStrategy* strategy = new MaCrossoverStrategy(g_tradingSystem);
-BotController bot(strategy);
+MaCrossoverStrategy* g_strategy = new MaCrossoverStrategy(g_tradingSystem);
 NewCandleObserver g_currentCandle(PERIOD_CURRENT);
 EnhancedTimeHandler *g_timeHandler = NULL;
 
@@ -36,6 +34,7 @@ EnhancedTimeHandler *g_timeHandler = NULL;
 int OnInit()
    {
     ResetLastError();
+
     logger = CLogger::GetInstance();
     logger.setLevel(logLevel);
     logger.log(LOG_DEBUG, "bot started!!");
@@ -58,7 +57,12 @@ void OnTick()
     if(LotSizeMode == LOT_BY_EQUITY)
         g_tradingSystem.setLotSize(getLotSize());
 
-    bot.OnNewTick();
+    g_strategy.updateData();
+    if(g_strategy.shouldBuy())
+        g_strategy.setBuy();
+    else
+        if(g_strategy.shouldSell())
+            g_strategy.setSell();
 
    }
 
@@ -76,8 +80,8 @@ void OnDeinit(const int reason)
     logger = NULL;
     delete g_tradingSystem;
     g_tradingSystem = NULL;
-    delete strategy;
-    strategy = NULL;
+    delete g_strategy;
+    g_strategy = NULL;
     const int errorCode = GetLastError();
     if(errorCode != ERR_NO_ERROR)
        {
